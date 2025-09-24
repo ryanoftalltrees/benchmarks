@@ -38,7 +38,8 @@ required_vars=(
   "CLIENT_LOAD_TEST_RIG_MAIN_CPU_CORE"
   "CLIENT_CPU_NODE"
   "SERVER_ECHO_CPU_CORE"
-  "SERVER_CPU_NODE")
+  "SERVER_CPU_NODE"
+  "RUN_INSIGHTS")
 
 for var in "${required_vars[@]}"; do
   if [[ -z "${!var+''}" ]]
@@ -76,6 +77,8 @@ if [[ -v AERON_DPDK_PORT_ID && -n ${AERON_DPDK_PORT_ID} ]];
 then
   dpdk_config_overrides+=" AERON_DPDK_PORT_ID=${AERON_DPDK_PORT_ID}"
 fi
+
+insights_enabled=$RUN_INSIGHTS
 
 context=""
 mtu_list=(1408)
@@ -206,6 +209,9 @@ function start_node()
       -Daeron.insights.exporter.listen.host=$HOSTNAME \
       -Daeron.dir=$AERON_DIR \
     "
+    if [ $insights_enabled = true ] then
+         ${CLIENT_BENCHMARKS_PATH}/scripts/aeron/insights &
+    fi
 }
 
 scripts_path="benchmarks_path_var/scripts/aeron"
