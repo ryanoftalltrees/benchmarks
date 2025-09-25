@@ -202,16 +202,16 @@ function start_node()
     ; $(pin_thread "\${pid}" "echo-${node_id}" "${!echo_cpu_var}") \
     && tail --pid=\$! -f /dev/null"
 
+    if [ $insights_enabled = true ] then
     echo "
       export JAVA_HOME=\${!java_home_var}\" PROCESS_FILE_NAME=\"insights\" \
       ; $(kill_java_process "insights") \
       && export JVM_OPTS=\" \
       -Daeron.insights.exporter.listen.host=$HOSTNAME \
       -Daeron.dir=$AERON_DIR \
-    "
-    if [ $insights_enabled = true ] then
-         ${CLIENT_BENCHMARKS_PATH}/scripts/aeron/insights &
+       && ${CLIENT_BENCHMARKS_PATH}/scripts/aeron/insights &"
     fi
+
 }
 
 scripts_path="benchmarks_path_var/scripts/aeron"
