@@ -354,7 +354,7 @@ do
           ; $(kill_java_process "${client_class_name}")\
           ; $(kill_java_process "${server_class_name}")\
           ; ${media_driver}\
-          && ${BENCHMARKS_PATH}/scripts/aeron/insights & \
+          && ${BENCHMARKS_PATH}/scripts/aeron/insights\
           && numactl --membind=${SERVER_CPU_NODE} --cpunodebind=${SERVER_CPU_NODE} --physcpubind=\"${NON_ISOLATED_CPU_CORES}\" ${BENCHMARKS_PATH}/scripts/aeron/echo-server & \
           $(await_java_process_start "${server_class_name}"); echo_pid=\${pid}; echo \"echo_pid=\${echo_pid}\" \
           && numactl --membind=${CLIENT_CPU_NODE} --cpunodebind=${CLIENT_CPU_NODE} --physcpubind=\"${NON_ISOLATED_CPU_CORES}\" ${BENCHMARKS_PATH}/scripts/aeron/echo-client & \
