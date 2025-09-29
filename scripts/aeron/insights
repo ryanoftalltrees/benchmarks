@@ -23,6 +23,6 @@ PROCESS_FILE_NAME="${PROCESS_FILE_NAME:-$(basename "${0}" .sh)-%p}"
 export PROCESS_FILE_NAME
 
 exec "${DIR}/../run-java" \
-  -jar insights-prometheus-exporter-http-server.jar \
+  -jar aeron-insights-0.2.0-SNAPSHOT.jar \
   "${DIR}/benchmark.properties" \
   "$@"
