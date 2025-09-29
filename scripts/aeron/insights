@@ -24,6 +24,6 @@ export PROCESS_FILE_NAME
 
 echo "current directory is " + ${DIR}
 exec "${DIR}/../run-java" \
-  -jar ../benchmarks-all/insights/build/libs/insights-prometheus-exporter-http-server.jar \
+  -jar ../../benchmarks-all/insights/build/libs/insights-prometheus-exporter-http-server.jar \
   "${DIR}/benchmark.properties" \
   "$@"
