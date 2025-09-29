@@ -22,7 +22,8 @@ DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 PROCESS_FILE_NAME="${PROCESS_FILE_NAME:-$(basename "${0}" .sh)-%p}"
 export PROCESS_FILE_NAME
 
+echo "current directory is " + ${DIR}
 exec "${DIR}/../run-java" \
-  -jar aeron-insights-0.2.0-SNAPSHOT.jar \
+  -jar build/aeron-insights-0.2.0-SNAPSHOT.jar \
   "${DIR}/benchmark.properties" \
   "$@"
