@@ -15,15 +15,52 @@
 ## limitations under the License.
 ##
 
-set -euxo pipefail
+set -euo pipefail
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
 
 PROCESS_FILE_NAME="${PROCESS_FILE_NAME:-$(basename "${0}" .sh)-%p}"
 export PROCESS_FILE_NAME
 
-echo "current directory is " + ${DIR}
-exec "${DIR}/../run-java" \
-  -jar ../../benchmarks-all/insights/build/libs/insights-prometheus-exporter-http-server.jar \
-  "${DIR}/benchmark.properties" \
-  "$@"
+PROPS_FILE=${DIR}"/benchmark.properties"
+
+# Whitelist the keys you want to forward as -D
+WANT_KEYS=(
+  "aeron.dir"
+  "aeron.archive.dir"
+  "aeron.cluster.dir"
+)
+
+# Build array of -D args, preserving spaces in values as single args
+JVM_DARGS=()
+
+for key in "${WANT_KEYS[@]}"; do
+  # Get last occurrence of key (if duplicates)
+  if line=$(grep -E "^[[:space:]]*${key}[[:space:]]*[:=]" "$PROPS_FILE" | tail -n1); then
+    # Strip leading/trailing spaces, split on first = or :
+    val=${line#*=}
+    if [[ "$line" == *":"* && "$line" != *"="* ]]; then
+      val=${line#*:}
+    fi
+    # Trim whitespace
+    val=$(printf "%s" "$val" | sed -E 's/^[[:space:]]+//; s/[[:space:]]+$//')
+    JVM_DARGS+=("-D${key}=${val}")
+  fi
+done
+
+ip=$(ip -4 route get 1.1.1.1 | awk '{print $7; exit}')
+cmd=(
+  "${DIR}/../run-java"
+  "${JVM_DARGS[@]}"
+  "-Daeron.insights.exporter.listen.host=${ip}"
+  -jar
+  "../../benchmarks-all/insights/build/libs/insights-prometheus-exporter-http-server.jar"
+)
+
+# Log the exact command (with shell-escaped args) into a string variable:
+command=$(printf '%q ' "${cmd[@]}"); command=${command% }
+
+printf 'Running: %s\n' "$command" >&2
+
+# Execute it:
+"${cmd[@]}"
